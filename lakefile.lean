@@ -1,10 +1,9 @@
 import Lake
 open Lake DSL
 
--- 패키지 이름은 따옴표 없이 식별자로 작성해야 합니다.
+-- 패키지 이름은 식별자로 작성합니다.
+-- 최신 Lake 버전에서는 'version'과 'keywords' 필드가 PackageConfig에서 제외되었습니다.
 package nzfc where
-  version := "0.1.0"
-  keywords := #["math", "physics", "riemann-hypothesis", "nzfc"]
   leanOptions := #[
     ⟨`pp.unicode.fun, true⟩,
     ⟨`pp.proofs.withType, false⟩
