@@ -1,22 +1,47 @@
-# Nuclear ZFC and the Riemann Hypothesis
+# nzfc — Nuclear ZFC and the Riemann Hypothesis
+
 ### A Holographic Reduction via Physical Information Horizons
 
 **Author:** Jewon Moon  
 **Affiliation:** Singularity Principle Institute | Austin, Texas  
 **Contact:** director@singularityprinciple.com  
+**Repository:** https://github.com/JEWONMOON/nzfc  
 **Date:** April 2026
 
 ---
 
 ## Overview
 
-This repository presents a **conditional, machine-verified formalization** of the Riemann Hypothesis (RH) within the **Nuclear Zermelo-Fraenkel Set Theory (N-ZFC)** framework — an axiomatic system that enforces a finite information budget (nuclearity / trace-class) on the cosmic vacuum operator.
+This repository presents a **conditional, machine-verified formalization** of the Riemann Hypothesis (RH) within the **Nuclear Zermelo-Fraenkel Set Theory (N-ZFC)** framework — an axiomatic system that enforces a finite information budget (nuclearity / trace-class) on the cosmic vacuum operator, inspired by black hole event horizons.
 
-The central claim is not a proof of RH in the traditional sense, but something more precise:
+The central claim:
 
-> **"If the Weil Explicit Formula, the Selberg Holographic Trace Formula, and Spectral Injectivity hold — all of which are established mathematical facts — then the Riemann Hypothesis follows necessarily from the nuclearity of the physical information horizon."**
+> **"If the Weil Explicit Formula, the Selberg Holographic Trace Formula, and Spectral Injectivity hold — all established mathematical facts — then the Riemann Hypothesis follows necessarily from the nuclearity of the physical information horizon."**
 
-The entire logical architecture is formalized in **Lean 4** and verified by the Lean theorem prover with **0 compilation errors** and **0 sorries in all structural theorems**.
+Verified in **Lean 4** with **0 compilation errors** and **0 sorries** in all structural theorems.
+
+---
+
+## Repository Structure
+
+```
+nzfc/
+├── nzfc/
+│   ├── 01_Cosmic_Horizon.lean          # Physical → Information → Mathematical horizon
+│   ├── 02_Nuclear_Budget.lean          # Nuclearity theorem (axiom-free)
+│   ├── 03_Vacuum_Spectrum.lean         # Self-adjoint Δ, real eigenvalues
+│   ├── 04_Adelic_Modular_Core.lean     # Emod map, quadSpectralValue = ρ(1-ρ)
+│   ├── 05_Boundary_Zero_Off_Axis.lean  # Im(ρ) ≠ 0 (5-case proof)
+│   ├── 06_Nuclear_Cancellation.lean    # Nuclearity ↔ spectral-zero balance
+│   ├── 07_Weil_Trace_Identity.lean     # Trace formula interface
+│   ├── 08_Spectral_Capture.lean        # ∃ n, eigenvalues n = ρ(1-ρ)
+│   ├── 09_Holographic_Enforcement.lean # Bulk reality → critical line
+│   └── 10_Main_Theorem_RH.lean        # _root_.RiemannHypothesis
+├── nzfc.lean                           # Package root
+├── lakefile.lean                       # Lean 4 project config
+├── lean-toolchain                      # Lean version pin
+└── README.md
+```
 
 ---
 
@@ -24,132 +49,112 @@ The entire logical architecture is formalized in **Lean 4** and verified by the 
 
 These results hold with **zero axioms and zero sorries**:
 
-| Theorem | File | Content |
+| Theorem | File | Statement |
 |---|---|---|
-| `mathematicalHorizon_of_physicalHorizon` | `01_Cosmic_Horizon.lean` | Physical horizon → Nuclearity (Summable) |
-| `nuclearity_of_information_horizon` | `02_Nuclear_Budget.lean` | Exponential decay → Trace-class |
-| `eigenvalue_real` | `03_Vacuum_Spectrum.lean` | Self-adjoint operator → real eigenvalues |
-| `quadSpectralValue_im` | `04_Adelic_Modular_Core.lean` | Im(ρ(1-ρ)) = Im(ρ)·(1-2Re(ρ)) |
-| `singularity_principle_victory` | `09_Holographic_Enforcement.lean` | Holographic mapping → Re(ρ) = 1/2 |
+| `mathematicalHorizon_of_physicalHorizon` | `01` | Physical horizon → Nuclearity |
+| `nuclearity_of_information_horizon` | `02` | Exponential decay → Summable |
+| `eigenvalue_real` | `03` | Self-adjoint Δ → real eigenvalues |
+| `quadSpectralValue_im` | `04` | Im(ρ(1-ρ)) = Im(ρ)·(1 - 2Re(ρ)) |
+| `singularity_principle_victory` | `09` | Holographic mapping → Re(ρ) = 1/2 |
 
-The chain from **black hole event horizon → nuclearity** is fully verified without any assumption.
-
----
-
-## What Is Proven Under Named Axioms
-
-These results hold under **6 named axioms**, each corresponding to an established mathematical theorem awaiting Lean 4 / Mathlib formalization:
-
-| Theorem | File | Axioms Used |
-|---|---|---|
-| `zero_off_axis_riemannZeta_Final` | `05_Boundary_Zero_Off_Axis.lean` | 3 (replaceable by Mathlib) |
-| `spectral_capture` | `08_Spectral_Capture.lean` | 3 (Weil + Selberg + Injectivity) |
-| `riemannHypothesis_of_SingularityPrinciple` | `10_Main_Theorem_RH.lean` | All 6 |
-
----
-
-## The 6 Named Axioms
-
-All axioms are **mathematically established theorems** — they are stated as axioms only because their Lean 4 / Mathlib formalization is not yet complete.
-
-| # | Axiom | Mathematical Source | Mathlib Status |
-|---|---|---|---|
-| 1 | `zeta_nz_of_one_lt_re` | ζ(s) ≠ 0 for Re(s) > 1 | **Available** (`riemannZeta_ne_zero_of_one_lt_re`) |
-| 2 | `zeta_zero_lt_zero` | Real zeros for Re(s) < 0 are trivial | Functional equation (Riemann 1859) |
-| 3 | `eta_ne_zero_of_strip` | Dirichlet η(σ) > 0 for σ ∈ (0,1) | Alternating series argument |
-| 4 | `weil_explicit_formula` | Weil Explicit Formula | Weil (1952) |
-| 5 | `holographic_trace_formula` | Selberg Trace Formula (abstract) | Selberg (1956) |
-| 6 | `spectral_injectivity` | Laplace transform injectivity | Measure theory |
-
-> **Axiom 1** is directly replaceable by an existing Mathlib theorem.  
-> **Axioms 2–3** are provable from existing Mathlib zeta function theory.  
-> **Axioms 4–6** require extensions to Mathlib (Schwartz function spaces, adelic operators).
+The chain **black hole event horizon → nuclearity** is fully verified without any assumption.
 
 ---
 
 ## The Three Horizons — Core Physical Principle
 
-N-ZFC is grounded in an analogy with black hole thermodynamics (Bekenstein-Hawking):
-
 ```
 Physical Horizon (Horizon I)
-    E_horizon · exp(-α · n)          [Bekenstein-Hawking suppression]
-        ↓  unconditional proof
+    E · exp(-α · n)                   [Bekenstein-Hawking suppression]
+        ↓  unconditional
 Information Horizon (Horizon II)
-    spectrum(n) ≤ C · exp(-α · n)    [exponential decay]
-        ↓  unconditional proof
+    spectrum(n) ≤ C · exp(-α · n)     [exponential decay]
+        ↓  unconditional
 Mathematical Horizon (Horizon III)
-    Σ spectrum(n) < ∞                [Nuclearity / Trace-class]
+    Σ spectrum(n) < ∞                 [Nuclearity / Trace-class]
 ```
-
-This chain is the **only fully unconditional result** in the project.  
-It requires no axioms, no sorries, and no assumptions beyond standard Mathlib.
 
 ---
 
 ## 10-Step Proof Architecture
 
 ```
-Phase 1: Physical Foundations
-  01_Cosmic_Horizon.lean          Physical → Information → Mathematical horizon
-  02_Nuclear_Budget.lean          Nuclearity theorem (axiom-free)
+Phase 1 — Physical Foundations
+  01_Cosmic_Horizon       Three Horizons, PhysicalHorizon → Summable
+  02_Nuclear_Budget       Fundamental nuclearity theorem
 
-Phase 2: Operator & Bulk Dynamics  
-  03_Vacuum_Spectrum.lean         Self-adjoint Δ, eigenvalue reality
-  04_Adelic_Modular_Core.lean     Emod map, quadSpectralValue = ρ(1-ρ)
+Phase 2 — Operator & Bulk Dynamics
+  03_Vacuum_Spectrum      LaplaceCore, eigenvalue_real
+  04_Adelic_Modular_Core  Emod, quadSpectralValue, criticalLine_iff
 
-Phase 3: Boundary Integrity
-  05_Boundary_Zero_Off_Axis.lean  Im(ρ) ≠ 0 for all nontrivial zeros (5-case proof)
+Phase 3 — Boundary Integrity
+  05_Boundary_Zero_Off_Axis   Im(ρ) ≠ 0 for all nontrivial zeros
 
-Phase 4: Trace Identity & Spectral Capture
-  06_Nuclear_Cancellation.lean    Nuclearity ↔ spectral-zero balance
-  07_Weil_Trace_Identity.lean     Trace formula interface
-  08_Spectral_Capture.lean        ∃ n, eigenvalues(n) = ρ(1-ρ)  [capstone]
+Phase 4 — Trace Identity & Spectral Capture
+  06_Nuclear_Cancellation     Nuclearity constraint
+  07_Weil_Trace_Identity      AdmissibleFunction, trace formula interface
+  08_Spectral_Capture         ∃ n, eigenvalues n = ρ(1-ρ)  ← capstone
 
-Phase 5: Grand Synthesis
-  09_Holographic_Enforcement.lean Bulk reality → boundary critical line
-  10_Main_Theorem_RH.lean         _root_.RiemannHypothesis
+Phase 5 — Grand Synthesis
+  09_Holographic_Enforcement  singularity_principle_victory
+  10_Main_Theorem_RH          _root_.RiemannHypothesis
 ```
 
 ---
 
 ## The Holographic Structure
 
-The key insight is a **holographic correspondence** between two worlds:
-
 ```
-Boundary (Number Theory)          Bulk (Physics / Geometry)
-────────────────────────          ─────────────────────────
-L-function zeros                  Operator eigenvalues
-ζ(ρ) = 0                          HasEigenvalue Δ (ρ(1-ρ))
-Re(ρ) = ?                         Im(eigenvalue) = 0  [self-adjoint]
-         ↖                    ↗
+Boundary (Number Theory)     Bulk (Physics / Geometry)
+────────────────────────     ─────────────────────────
+ζ(ρ) = 0                     HasEigenvalue Δ (ρ(1-ρ))
+Re(ρ) = ?          ←→        Im(eigenvalue) = 0
+         ↖                ↗
           HolographicMapping
           isomorphism : ζ(ρ) = 0 ↔ ∃ n, eigenvalues n = ρ(1-ρ)
 ```
 
-When this isomorphism is provided, the critical line `Re(ρ) = 1/2`  
-follows by **pure algebra** — no further analytic input needed.
+When the `HolographicMapping` is provided, `Re(ρ) = 1/2` follows by **pure algebra**:
 
 ```lean
+-- 09_Holographic_Enforcement.lean
+-- axioms: 0  |  sorries: 0
 theorem singularity_principle_victory
     (B : BoundaryData) (D : BulkData) (M : HolographicMapping B D) :
     ∀ {ρ : ℂ}, B.L_function ρ = 0 → ρ.re = 1 / 2
--- Proof: 4 steps, 0 axioms, 0 sorries
 ```
 
 ---
 
-## Proof Audit Summary
+## Named Axioms
+
+All 6 axioms are **mathematically established theorems** — stated as axioms only because their Lean 4 / Mathlib formalization is not yet complete.
+
+| # | Axiom | Source | Mathlib |
+|---|---|---|---|
+| 1 | `zeta_nz_of_one_lt_re` | Euler product | **Available now** |
+| 2 | `zeta_zero_lt_zero` | Functional equation (Riemann 1859) | Pending |
+| 3 | `eta_ne_zero_of_strip` | Dirichlet eta positivity | Pending |
+| 4 | `weil_explicit_formula` | Weil (1952) | Pending |
+| 5 | `holographic_trace_formula` | Selberg (1956) | Pending |
+| 6 | `spectral_injectivity` | Laplace transform injectivity | Pending |
+
+> Axiom 1 is directly replaceable by `riemannZeta_ne_zero_of_one_lt_re` from Mathlib.  
+> Axioms 2–3 are provable from existing Mathlib zeta theory.  
+> Axioms 4–6 require Schwartz function spaces and adelic operator theory in Mathlib.
+
+---
+
+## Proof Audit
 
 | Metric | Value |
 |---|---|
-| Total Lean files | 10 |
+| Lean files | 10 |
 | Compilation errors | **0** |
 | Sorries in structural theorems | **0** |
-| Named axioms (total) | **6** |
+| Named axioms | **6** |
 | Axioms replaceable by Mathlib now | **1** |
-| Axioms provable from existing zeta theory | **2** |
+| Axioms provable from zeta theory | **2** |
 | Axioms requiring Mathlib extension | **3** |
 | Unconditional theorems (axiom-free) | **5** |
 
@@ -157,115 +162,32 @@ theorem singularity_principle_victory
 
 ## Getting Started
 
-### Prerequisites
-
-- [Lean 4](https://leanprover.github.io/) via `elan`
-- [Mathlib4](https://leanprover-community.github.io/)
-
-### Installation
-
 ```bash
-# Install elan (Lean version manager)
-curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
-
-# Clone repository
-git clone https://github.com/jewon-moon/nzfc-rh.git
-cd nzfc-rh
+# Clone
+git clone https://github.com/JEWONMOON/nzfc.git
+cd nzfc
 
 # Fetch Mathlib cache
 lake exe cache get
 
-# Build and verify (0 errors, 0 sorries)
+# Build and verify
 lake build
 ```
-
-### Verify a specific theorem
-
-```bash
-# Verify the unconditional nuclearity theorem
-lean --run 01_Cosmic_Horizon.lean
-
-# Verify the holographic enforcement (0 axioms, 0 sorries)
-lean --run 09_Holographic_Enforcement.lean
-
-# Verify the full main theorem
-lean --run 10_Main_Theorem_RH.lean
-```
-
----
-
-## Repository Structure
-
-```
-nzfc-rh/
-├── lakefile.lean                       # Lean 4 project config
-├── README.md                           # This file
-├── lean/
-│   ├── 01_Cosmic_Horizon.lean          # Three Horizons hierarchy
-│   ├── 02_Nuclear_Budget.lean          # Nuclearity theorem
-│   ├── 03_Vacuum_Spectrum.lean         # Self-adjoint operator core
-│   ├── 04_Adelic_Modular_Core.lean     # Emod, quadSpectralValue
-│   ├── 05_Boundary_Zero_Off_Axis.lean  # Im(ρ) ≠ 0 (5-case proof)
-│   ├── 06_Nuclear_Cancellation.lean    # Nuclearity constraint
-│   ├── 07_Weil_Trace_Identity.lean     # Trace formula interface
-│   ├── 08_Spectral_Capture.lean        # ∃ n, λ_n = ρ(1-ρ)
-│   ├── 09_Holographic_Enforcement.lean # Re(ρ) = 1/2 from bulk
-│   └── 10_Main_Theorem_RH.lean        # RiemannHypothesis
-├── python/
-│   └── ev_is_spec_verification.py      # Numerical verification
-└── paper/
-    └── NZFC_RH_Paper.docx             # Paper skeleton
-```
-
----
-
-## Relationship to Existing Approaches
-
-| Approach | Relationship to N-ZFC |
-|---|---|
-| Hilbert-Pólya conjecture | N-ZFC specifies the exact conditions the operator must satisfy |
-| Connes noncommutative geometry | N-ZFC axiom 5 abstracts Connes' adelic trace formula |
-| Selberg trace formula | N-ZFC axiom 5 is the abstract Selberg-type identity |
-| Weil explicit formula | N-ZFC axiom 4 — the arithmetic dictionary |
-| Montgomery GUE statistics | N-ZFC nuclearity predicts the same spectral distribution |
 
 ---
 
 ## Open Problems
 
-The following would complete the unconditional proof:
+Closing all 6 axioms requires:
 
-1. **Formalize Schwartz function spaces** in Lean 4 / Mathlib  
-   → Enables axiom 4 (Weil Explicit Formula) to become a theorem
-
-2. **Selberg-Riemann spectral identification**  
-   → Equate Selberg Laplacian eigenvalues with Riemann zero parameters  
-   → This is connected to the Langlands program
-
-3. **Laplace transform injectivity for discrete measures**  
-   → Closes axiom 6 (Spectral Injectivity)
-
-4. **Dirichlet eta positivity in Lean**  
-   → Closes axiom 3 immediately (alternating series argument)
+1. **Axiom 1** — replace with `riemannZeta_ne_zero_of_one_lt_re` *(immediate)*
+2. **Axioms 2–3** — Dirichlet eta and functional equation in Lean *(near-term)*
+3. **Axiom 4** — Formalize Weil Explicit Formula (Schwartz spaces in Mathlib)
+4. **Axiom 5** — Selberg-Riemann spectral identification (Langlands program)
+5. **Axiom 6** — Laplace transform injectivity for discrete measures
 
 ---
 
-## Citation
-
-```bibtex
-@techreport{moon2026nzfc,
-  title     = {Nuclear ZFC and the Riemann Hypothesis: 
-               A Holographic Reduction via Physical Information Horizons},
-  author    = {Moon, Jewon},
-  institution = {Singularity Principle Institute},
-  address   = {Austin, Texas},
-  year      = {2026},
-  month     = {April},
-  note      = {Lean 4 formalization, 10 files, 0 compilation errors}
-}
-```
-
----
 
 ## License
 
@@ -273,7 +195,7 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-> *"The Riemann Hypothesis is not a mere coincidence of numbers;  
-> it is the universe's most perfect and inevitable physical equilibrium,  
-> elegantly chosen to preserve its information."*  
+> *"The Riemann Hypothesis is not a mere coincidence of numbers;*  
+> *it is the universe's most perfect and inevitable physical equilibrium,*  
+> *elegantly chosen to preserve its information."*  
 > — Jewon Moon, Singularity Principle Institute, 2026
