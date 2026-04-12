@@ -8,3 +8,14 @@ import nzfc.07_Weil_Trace_Identity
 import nzfc.08_Spectral_Capture
 import nzfc.09_Holographic_Enforcement
 import nzfc.10_Main_Theorem_RH
+import nzfc.11_Weil_Zeros_Spectral_Realization
+import nzfc.12_Adelic_Spectral_Correspondence
+import nzfc.13_Critical_Line_Algebraic_Rigidity
+import nzfc.14_Nuclear_Vacuum_Hilbert_Polya
+import nzfc.15_Nuclear_Vacuum_Abstract_Structure
+import nzfc.16_Selberg_Laplacian_Vacuum_Instance
+import nzfc.17_Selberg_Symmetry_Self_Adjoint
+import nzfc.18_Green_Identity_Self_Adjoint
+import nzfc.19_Determinant_Eigenvalue_Bridge
+import nzfc.20_Weil_Selberg_Duality_Integration
+import nzfc.21_Modular_Factorization_Selberg_Riemann
