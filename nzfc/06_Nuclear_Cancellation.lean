@@ -38,8 +38,9 @@ theorem nuclear_cancellation_constraint
   · -- 역방향: 선 이탈 -> 핵성 파괴 (귀류법)
     intro h_summable
     by_contra h_exists_off_line
-    -- push_neg 대신 최신 문법 push Not 사용 (경고 해결)
-    push Not at h_exists_off_line
+    
+    -- 💡 [수정됨] 존재하지 않는 'push Not'을 Lean 4 표준 문법인 'push_neg'로 변경했습니다.
+    push_neg at h_exists_off_line
     rcases h_exists_off_line with ⟨n, h_im_nz⟩
     
     /- 
@@ -48,6 +49,7 @@ theorem nuclear_cancellation_constraint
       2. ‖S.h (zeros n)‖ ≥ exp(β * (zeros n).im²) 가 성립함을 보임.
       3. (zeros n).im ≠ 0 이면 이 값은 1보다 큰 상수가 되어 수렴성을 위협.
     -/
+    -- 💡 [수정됨] 에러 없이 깔끔하게 sorry로 닫힙니다.
     sorry
 
 end SingularityPrinciple
