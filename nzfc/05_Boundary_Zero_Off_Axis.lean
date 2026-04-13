@@ -2,14 +2,13 @@ import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
 import Mathlib.Tactic
+import nzfc.«03_Vacuum_Spectrum»
 
 noncomputable section
 open Complex Real Topology
 
 namespace SingularityPrinciple
 
-def IsNontrivialZero (s : ℂ) : Prop :=
-  riemannZeta s = 0 ∧ (∀ n : ℕ, s ≠ -2 * (n + 1)) ∧ s ≠ 1
 
 def dirichletEta (s : ℂ) : ℂ := (1 - 2^(1-s)) * riemannZeta s
 
