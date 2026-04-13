@@ -43,7 +43,7 @@ variable {S : SpectralLayer}
 theorem hw_pos (HL : HeatLayer S) (n : ℕ) : 0 < HL.heatWeights n := by
   rw [HL.hw_def n]; exact Real.exp_pos _
 
-/-- [v31.9] linarith의 탐색 범위를 좁히기 위해 핵심 부등식을 명시적으로 주입 -/
+/-- [v31.9] Weyl's Law 기반의 에너지 간격(Gap)을 가정하여 수렴성 증명 -/
 theorem hw_summable (HL : HeatLayer S) : Summable HL.heatWeights := by
   obtain ⟨gap, hgap_pos, h_gap_bound⟩ : ∃ gap > 0, 
       ∀ n, S.spectralValues 0 + gap * n ≤ S.spectralValues n := by 
@@ -61,23 +61,22 @@ theorem hw_summable (HL : HeatLayer S) : Summable HL.heatWeights := by
     Summable.mul_left C (summable_geometric_of_lt_one (Real.exp_pos _).le hr)
 
   rw [funext HL.hw_def]
-  refine Summable.of_nonneg_of_le (λ n => (Real.exp_pos _).le) ?_ h_geom
+  -- 💡 [수정됨] λ 기호를 fun 키워드로 교체하여 문법 에러를 방지했습니다.
+  refine Summable.of_nonneg_of_le (fun n => (Real.exp_pos _).le) ?_ h_geom
   intro n
   dsimp [r, C]
   rw [← Real.exp_nat_mul, ← Real.exp_add]
   apply Real.exp_le_exp.mpr
-  -- [Correction] linarith가 자연수 캐스트와 부호 분포를 인식하도록 보조
   have h1 := h_gap_bound n
   have h2 : 0 ≤ HL.β := HL.hβ.le
   have h3 : HL.β * (S.spectralValues 0 + gap * n) ≤ HL.β * S.spectralValues n :=
     mul_le_mul_of_nonneg_left h1 h2
-  -- 수식의 구조를 linarith가 선형적으로 파악할 수 있게 단순화
   ring_nf at h3 ⊢
   linarith
 
 end HeatLayer
 
--- [UnifiedAdelicVacuum 및 리만 가설 유도 로직 유지]
+-- [Adelic Vacuum & RH Deduction Logic]
 axiom selberg_spectral_identification (S : SpectralLayer) :
     ∀ {ρ : ℂ}, IsNontrivialZero ρ →
       ρ.im ≠ 0 ∧ ∃ n, quadSpectralValue ρ = ((S.spectralValues n : ℝ) : ℂ)
@@ -136,7 +135,6 @@ theorem riemann_hypothesis_realization (V : TwoLayerVacuum H) {ρ : ℂ} (hρ : 
   linarith
 end TwoLayerVacuum
 
--- 💡 [수정됨] Mathlib 업데이트로 인한 RiemannHypothesis 정의 충돌을 막기 위해 명시적 조건식으로 변경
 theorem Singularity_Principle_TwoLayer
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (V : TwoLayerVacuum H) :
