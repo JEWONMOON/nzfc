@@ -26,7 +26,7 @@ axiom eta_ne_zero_of_strip {σ : ℝ} (h : 0 < σ ∧ σ < 1) :
   dirichletEta (σ : ℂ) ≠ 0
 
 --------------------------------------------------------------------------------
--- [Main Theorem] Zero-Sorry Integrated Proof (v43.3)
+-- [Main Theorem] Zero-Sorry Integrated Proof (v4.29.0 Optimized)
 --------------------------------------------------------------------------------
 
 theorem zero_off_axis_riemannZeta_Final {ρ : ℂ} (hρ : IsNontrivialZero ρ) : 
@@ -44,13 +44,12 @@ theorem zero_off_axis_riemannZeta_Final {ρ : ℂ} (hρ : IsNontrivialZero ρ) :
   by_cases h_eq1 : ρ.re = 1
   · exact hne1 (by rw [hreal, h_eq1]; norm_num)
 
-  -- [Case 3] Re = 0 (순방향 추론으로 과잉 치환 원천 봉쇄)
+  -- [Case 3] Re = 0
   by_cases h_eq0 : ρ.re = 0
   · have h_rho_zero : ρ = 0 := by 
       rw [hreal, h_eq0]
       norm_num
     
-    -- hzeta (ζ(ρ) = 0) 복사본에 ρ = 0 을 대입하여 ζ(0) = 0 도출
     have h_eval : riemannZeta (0 : ℂ) = 0 := by
       have hz := hzeta
       rw [h_rho_zero] at hz
@@ -66,7 +65,8 @@ theorem zero_off_axis_riemannZeta_Final {ρ : ℂ} (hρ : IsNontrivialZero ρ) :
     exact htriv n hn
 
   -- [Case 5] 0 < Re < 1
-  · -- 💡 [수정됨] 존재하지 않는 'push Not' 대신 명시적인 부등식 정리를 사용
+  · -- 💡 v4.29 수정: push Not 대신 push_neg를 사용하고 부등식 관계를 명시합니다.
+    push_neg at h_gt1 h_eq1 h_eq0 h_lt0
     have h_pos : 0 < ρ.re := lt_of_le_of_ne (le_of_not_lt h_lt0) (Ne.symm h_eq0)
     have h_lt1 : ρ.re < 1 := lt_of_le_of_ne (le_of_not_lt h_gt1) h_eq1
     have h_strip : 0 < ρ.re ∧ ρ.re < 1 := ⟨h_pos, h_lt1⟩
