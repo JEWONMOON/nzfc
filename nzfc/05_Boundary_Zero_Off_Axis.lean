@@ -66,9 +66,9 @@ theorem zero_off_axis_riemannZeta_Final {ρ : ℂ} (hρ : IsNontrivialZero ρ) :
     exact htriv n hn
 
   -- [Case 5] 0 < Re < 1
-  · push Not at h_gt1 h_eq1 h_eq0 h_lt0
-    have h_pos : 0 < ρ.re := lt_of_le_of_ne h_lt0 (Ne.symm h_eq0)
-    have h_lt1 : ρ.re < 1 := lt_of_le_of_ne h_gt1 h_eq1
+  · -- 💡 [수정됨] 존재하지 않는 'push Not' 대신 명시적인 부등식 정리를 사용
+    have h_pos : 0 < ρ.re := lt_of_le_of_ne (le_of_not_lt h_lt0) (Ne.symm h_eq0)
+    have h_lt1 : ρ.re < 1 := lt_of_le_of_ne (le_of_not_lt h_gt1) h_eq1
     have h_strip : 0 < ρ.re ∧ ρ.re < 1 := ⟨h_pos, h_lt1⟩
     
     have h_eta_zero : dirichletEta (ρ.re : ℂ) = 0 := by
