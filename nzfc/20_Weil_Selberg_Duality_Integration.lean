@@ -4,7 +4,6 @@ import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.Tactic
 
 set_option maxHeartbeats 4000000
-set_option linter.unusedVariables false
 
 noncomputable section
 open Complex Real Topology
@@ -46,8 +45,8 @@ theorem selberg_is_self_adjoint : IsSelfAdjoint selbergLaplacian := by
   erw [greens_first_identity u v]
   erw [← inner_conj_symm]
   erw [greens_first_identity v u]
-  rw [dirichletInner_symm u v]
-  simp
+  -- 💡 [수정됨] 불필요한 simp 전술 제거 (경고 해결)
+  exact dirichletInner_symm u v
 
 -- ══════════════════════════════════════
 -- 3. 산술-기하 이중성 및 스펙트럼 포획 (Arithmetic Bridge)
@@ -77,9 +76,11 @@ theorem self_adjoint_has_real_eigenvalues {H : Type*}
     (D : H →L[ℂ] H) (h_sa : IsSelfAdjoint D) 
     (val : ℂ) (h_eigen : Module.End.HasEigenvalue (D : H →ₗ[ℂ] H) val) : 
     val.im = 0 := by
+  -- 💡 [수정됨] 최신 Mathlib 4의 구조 변화에 맞게 Eigenvector 분해 방식 변경
   rcases Module.End.HasEigenvalue.exists_hasEigenvector h_eigen with ⟨v, hv⟩
-  have hv_ne := (Module.End.hasEigenvector_iff.mp hv).2
-  have hv_eq := Module.End.HasEigenvector.apply_eq_smul hv
+  have hv_ne : v ≠ 0 := hv.right
+  have hv_eq : (D : H →ₗ[ℂ] H) v = val • v := hv.left
+  
   have hS := h_sa.isSymmetric v v
   rw [hv_eq] at hS
   simp only [inner_smul_left, inner_smul_right] at hS
