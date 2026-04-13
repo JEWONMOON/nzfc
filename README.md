@@ -81,8 +81,8 @@ nzfc/
 │   ├── 18_Green_Identity_Self_Adjoint.lean       # Green's theorem → IsSelfAdjoint  ✅
 │   ├── 19_Determinant_Eigenvalue_Bridge.lean     # det(Δ−λI)=0 ↔ HasEigenvalue
 │   ├── 20_Weil_Selberg_Duality_Integration.lean  # Weil explicit = Selberg trace
-│   └── 21_Modular_Factorization_Selberg_Riemann.lean  # Z(s)=ζ(s)·L(s) → theorem  ✅
-├── NZFC_Final_Integrated.lean                    # Integration layer (entry point)
+│   ├── 21_Modular_Factorization_Selberg_Riemann.lean  # Z(s)=ζ(s)·L(s) → theorem  ✅
+│   └── NZFC_Final_Integrated.lean                # Integration layer (entry point)
 ├── nzfc.lean                                     # Package root
 ├── lakefile.lean                                 # Lean 4 project config
 ├── lean-toolchain                                # Lean 4.29.0
