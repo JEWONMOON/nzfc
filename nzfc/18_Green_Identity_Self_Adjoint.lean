@@ -27,42 +27,30 @@ opaque selbergLaplacian : SelbergSpace →L[ℂ] SelbergSpace
 opaque dirichletInner (u v : SelbergSpace) : ℂ
 
 -- ══════════════════════════════════════
--- 2. 그린의 정리 및 대칭성 도출 (0-Error 수선본)
+-- 2. 그린의 정리 및 대칭성 도출 (4.29.0 대응)
 -- ══════════════════════════════════════
 
-/-- 💡 [수정됨] inner ℂ (x) (y) 대신 inner (x) (y) 사용 (타입 에러 해결) -/
 axiom greens_first_identity (u v : SelbergSpace) :
     inner (selbergLaplacian u) v = - dirichletInner u v
 
-/-- [Axiom: Dirichlet Symmetry] -/
 axiom dirichletInner_symm (u v : SelbergSpace) : 
     dirichletInner u v = star (dirichletInner v u)
 
-/-- 
-[Theorem: Selberg Symmetry] 
-역방향 rewrite(←)를 통해 타입 체커를 완벽히 통과합니다.
--/
 theorem selberg_is_symmetric (u v : SelbergSpace) :
     inner (selbergLaplacian u) v = inner u (selbergLaplacian v) := by
-  -- 1. 좌변에 그린의 정리 적용: <Δu, v> = -D(u, v)
   rw [greens_first_identity u v]
-  -- 2. 우변에 내적의 성질 적용: <u, Δv> = star <Δv, u>
   rw [← inner_conj_symm]
-  -- 3. star 내부의 <Δv, u>에 그린의 정리 적용
   rw [greens_first_identity v u]
-  -- 4. Dirichlet 항의 대칭성 적용: D(u, v) = star D(v, u)
-  rw [dirichletInner_symm u v]
-  -- 5. star 연산의 선형성(-x의 star는 -star x)과 대수적 정리를 통해 종결
-  simp
+  -- 💡 [v4.29 수정] 엄격해진 부호(Negative) 분배 법칙을 simp가 자동 처리하도록 위임합니다.
+  simp [dirichletInner_symm]
 
-/-- 자기수반성 도출 (0-sorry) -/
 theorem selberg_is_self_adjoint : IsSelfAdjoint selbergLaplacian := by
   rw [ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric]
   intro x y
   exact selberg_is_symmetric x y
 
 -- ══════════════════════════════════════
--- 3. 리만 가설 연역 (0-sorry)
+-- 3. 리만 가설 연역
 -- ══════════════════════════════════════
 
 def IsNontrivialZero (s : ℂ) : Prop :=
@@ -76,16 +64,14 @@ theorem self_adjoint_has_real_eigenvalues {H : Type*}
     (D : H →L[ℂ] H) (h_sa : IsSelfAdjoint D) 
     (val : ℂ) (h_eigen : Module.End.HasEigenvalue (D : H →ₗ[ℂ] H) val) : 
     val.im = 0 := by
-  -- 💡 [수정됨] 최신 Mathlib 4의 구조 변화에 맞게 Eigenvector 분해 방식 변경
   rcases Module.End.HasEigenvalue.exists_hasEigenvector h_eigen with ⟨v, hv⟩
   have hv_ne : v ≠ 0 := hv.right
-  have hv_eq : (D : H →ₗ[ℂ] H) v = val • v := hv.left
+  -- 💡 [v4.29 수정] Eigenspace에서 방정식(D v = val • v)을 추출하는 Mathlib 최신 API 적용
+  have hv_eq : (D : H →ₗ[ℂ] H) v = val • v := hv.apply_eq_smul
   
   have hS := h_sa.isSymmetric v v
   rw [hv_eq] at hS
   simp only [inner_smul_left, inner_smul_right] at hS
-  
-  -- 💡 [수정됨] inner ℂ v v 대신 inner v v 사용
   have hvne : inner v v ≠ 0 := inner_self_ne_zero.mpr hv_ne
   have hconj := mul_right_cancel₀ hvne hS
   have him1 := congrArg Complex.im hconj
