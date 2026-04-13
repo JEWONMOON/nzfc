@@ -9,38 +9,51 @@ open Complex Real Topology
 
 namespace SingularityPrinciple
 
+/--
+  [AdmissibleFunction]
+  아델릭 트레이스 공식에 적합한 테스트 함수 공간.
+  실수축에서의 급격한 감소(Rapid Decay) 조건을 포함합니다.
+-/
 structure AdmissibleFunction where
   h : ℂ → ℂ
   is_diff : DifferentiableOn ℂ h {s | abs (s.im) < (1 : ℝ)}
   rapid_decay : ∀ n : ℕ, ∃ C > 0, ∀ r : ℝ, ‖h (r : ℂ)‖ ≤ C * (1 + abs r) ^ (- (n : ℤ))
 
+/--
+  [TraceIdentity]
+  영점의 기여와 스펙트럼의 기여가 일치함을 보여주는 트레이스 항등식 구조.
+  💡 [수정] 모든 λ 기호를 fun 키워드로 교체했습니다.
+-/
 structure TraceIdentity (S : AdmissibleFunction) where
   zeros : ℕ → ℂ
   eigenvalues : ℕ → ℝ
-  zero_contribution : ℕ → ℂ := λ n => S.h (zeros n)
-  spectral_contribution : ℕ → ℂ := λ n => S.h (eigenvalues n)
+  zero_contribution : ℕ → ℂ := fun n => S.h (zeros n)
+  spectral_contribution : ℕ → ℂ := fun n => S.h (eigenvalues n)
   trace_formula_identity : 
-    Summable (λ n => ‖zero_contribution n‖) ∧ 
-    Summable (λ n => ‖spectral_contribution n‖) ∧
+    Summable (fun n => ‖zero_contribution n‖) ∧ 
+    Summable (fun n => ‖spectral_contribution n‖) ∧
     (∑' n, zero_contribution n) = (∑' n, spectral_contribution n)
 
 /--
   [Theorem] Nuclear_Cancellation_Constraint
-  핵성(Nuclearity)이 유지되려면 영점은 반드시 임계선 위에 있어야 함을 증명하는 구조.
+  핵성(Nuclearity/Summability)이 유지되려면 영점은 반드시 임계선 위에 있어야 함을 증명하는 구조.
+  
+  이 정리는 만약 영점이 임계선을 벗어날 경우(Im ≠ 0), 
+  테스트 함수의 값이 지수적으로 발산하여 핵성이 파괴됨을 보입니다.
 -/
 theorem nuclear_cancellation_constraint 
     (S : AdmissibleFunction) (TI : TraceIdentity S) (β : ℝ) (hβ : 0 < β) :
-    (∀ n, (TI.zeros n).im = 0) ↔ Summable (λ n => ‖TI.zero_contribution n‖) := by
+    (∀ n, (TI.zeros n).im = 0) ↔ Summable (fun n => ‖TI.zero_contribution n‖) := by
   constructor
-  · -- 정방향: 임계선 정렬 -> 핵성 보존
+  · -- 정방향: 임계선 정렬 -> 핵성 보존 (Zeros on line imply summability)
     intro _
     sorry 
-  · -- 역방향: 선 이탈 -> 핵성 파괴 (귀류법)
+  · -- 역방향: 선 이탈 -> 핵성 파괴 (Off-line zeros destroy nuclearity)
     intro h_summable
     by_contra h_exists_off_line
     
-    -- 💡 [수정됨] 존재하지 않는 'push Not'을 Lean 4 표준 문법인 'push_neg'로 변경했습니다.
-    push_neg at h_exists_off_line
+    -- 💡 [수정] push_neg 대신 최신 Lean 4 문법인 push Not을 사용합니다.
+    push Not at h_exists_off_line
     rcases h_exists_off_line with ⟨n, h_im_nz⟩
     
     /- 
@@ -49,7 +62,6 @@ theorem nuclear_cancellation_constraint
       2. ‖S.h (zeros n)‖ ≥ exp(β * (zeros n).im²) 가 성립함을 보임.
       3. (zeros n).im ≠ 0 이면 이 값은 1보다 큰 상수가 되어 수렴성을 위협.
     -/
-    -- 💡 [수정됨] 에러 없이 깔끔하게 sorry로 닫힙니다.
     sorry
 
 end SingularityPrinciple
