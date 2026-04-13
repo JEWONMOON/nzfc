@@ -38,14 +38,14 @@
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Tactic
 
-import Nzfc.«01_Cosmic_Horizon»
-import Nzfc.«02_Nuclear_Budget»
-import Nzfc.«04_Adelic_Modular_Core»
-import Nzfc.«05_Boundary_Zero_Off_Axis»
-import Nzfc.«08_Spectral_Capture»
-import Nzfc.«10_Main_Theorem_RH»
-import Nzfc.«18_Green_Identity_Self_Adjoint»
-import Nzfc.«21_Modular_Factorization_Selberg_Riemann»
+import nzfc.«01_Cosmic_Horizon»
+import nzfc.«02_Nuclear_Budget»
+import nzfc.«04_Adelic_Modular_Core»
+import nzfc.«05_Boundary_Zero_Off_Axis»
+import nzfc.«08_Spectral_Capture»
+import nzfc.«10_Main_Theorem_RH»
+import nzfc.«18_Green_Identity_Self_Adjoint»
+import nzfc.«21_Modular_Factorization_Selberg_Riemann»
 
 noncomputable section
 open Complex Real Topology
