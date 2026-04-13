@@ -2,6 +2,7 @@ import Mathlib.NumberTheory.LSeries.RiemannZeta
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Complex
 import Mathlib.Tactic
+-- 💡 [Name Collision Fix] Import IsNontrivialZero directly from file 03.
 import nzfc.«03_Vacuum_Spectrum»
 
 noncomputable section
@@ -9,18 +10,24 @@ open Complex Real Topology
 
 namespace SingularityPrinciple
 
-
 def dirichletEta (s : ℂ) : ℂ := (1 - 2^(1-s)) * riemannZeta s
 
 --------------------------------------------------------------------------------
--- [Mathematical Axioms] 해석적 정수론의 3대 기반 사실
+-- [ZFC Mathematical Facts] Three foundational facts of analytic number theory
+-- 💡 Note: The axioms below are NOT specific physical hypotheses of N-ZFC (like A4).
+-- They are trivial theorems of analytic number theory provable within standard 
+-- mathematics (ZFC), and are currently in a 'pending proof' state, to be replaced 
+-- by actual theorems using Mathlib tactics later.
 --------------------------------------------------------------------------------
 
+/-- The Riemann zeta function has no zeros in Re(s) > 1 (absolute convergence of the Euler product) -/
 axiom zeta_nz_of_one_lt_re {s : ℂ} (h : 1 < s.re) : riemannZeta s ≠ 0
 
+/-- The only zeros in Re(s) < 0 are the negative even integers (Trivial Zeros via functional equation) -/
 axiom zeta_zero_lt_zero {s : ℂ} (h1 : s.re < 0) (h2 : riemannZeta s = 0) : 
   ∃ n : ℕ, s = -2 * (n + 1)
 
+/-- The Dirichlet eta function has no zeros on the real axis within the critical strip (0 < Re < 1) -/
 axiom eta_ne_zero_of_strip {σ : ℝ} (h : 0 < σ ∧ σ < 1) : 
   dirichletEta (σ : ℂ) ≠ 0
 
@@ -43,13 +50,13 @@ theorem zero_off_axis_riemannZeta_Final {ρ : ℂ} (hρ : IsNontrivialZero ρ) :
   by_cases h_eq1 : ρ.re = 1
   · exact hne1 (by rw [hreal, h_eq1]; norm_num)
 
-  -- [Case 3] Re = 0 (순방향 추론으로 과잉 치환 원천 봉쇄)
+  -- [Case 3] Re = 0 (Block over-substitution via forward reasoning)
   by_cases h_eq0 : ρ.re = 0
   · have h_rho_zero : ρ = 0 := by 
       rw [hreal, h_eq0]
       norm_num
     
-    -- hzeta (ζ(ρ) = 0) 복사본에 ρ = 0 을 대입하여 ζ(0) = 0 도출
+    -- Substitute ρ = 0 into the copy of hzeta (ζ(ρ) = 0) to derive ζ(0) = 0
     have h_eval : riemannZeta (0 : ℂ) = 0 := by
       have hz := hzeta
       rw [h_rho_zero] at hz
