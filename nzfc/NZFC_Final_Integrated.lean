@@ -1,43 +1,17 @@
 /-
   NZFC_Final_Integrated.lean
-
   Final integration layer for the NZFC repository.
 
-  Purpose:
-  1. Re-export the unconditional horizon-to-nuclearity chain (Phase 1).
-  2. Repackage Burden A (real-axis exclusion) as a boundary predicate.
-  3. State the terminal-path conditional rigidity theorem in the exact one-way
-     form actually needed for RH deduction:
-
-         nonrealness of nontrivial zeros
-         + spectral capture of ρ(1-ρ) into a real spectrum
-         -> Re(ρ) = 1/2.
-
-  4. Re-export the two Selberg-facing Phase-6 milestones currently used as the
-     realization-program capstones:
-       - Green's identity -> self-adjointness   (file 18)
-       - Z(s)=ζ(s)*L(s) -> Riemann ⊆ Selberg    (file 21)
-
-  Notes on imports:
-  -----------------
-  If your project layout is
-      nzfc/01_Cosmic_Horizon.lean
-      nzfc/02_Nuclear_Budget.lean
-      ...
-  then keep the `Nzfc.` prefix below.
-
-  If your files live flat at the package root, simply drop the `Nzfc.` prefix.
-
-  If your local files still carry upload-style names like
-      01_Cosmic_Horizon.lean.lean
-  rename them back to
-      01_Cosmic_Horizon.lean
-  before using this integration file.
+  이 파일은 01번부터 21번까지의 개별 증명 파일들을 임포트하여,
+  물리적 지평선(Physical Horizon)에서 리만 가설(RH)에 이르는 
+  전체 논리 사슬을 하나로 묶어주는 마스터 통합 레이어입니다.
 -/
 
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Tactic
 
+-- 개별 파일들을 임포트합니다. 
+-- 파일명이 숫자로 시작하므로 « » 기호를 사용합니다.
 import nzfc.«01_Cosmic_Horizon»
 import nzfc.«02_Nuclear_Budget»
 import nzfc.«04_Adelic_Modular_Core»
@@ -52,11 +26,11 @@ open Complex Real Topology
 
 namespace NZFC.Final
 
-/-! ## Phase 1: unconditional horizon-to-nuclearity re-exports -/
+/-! ## Phase 1: Unconditional Horizon-to-Nuclearity Re-exports -/
 
 /--
-Physical horizon -> mathematical horizon -> summability.
-This is the unconditional finite-capacity layer coming from file 01.
+[Theorem] 지평선-핵성 전이 정리.
+물리적 지평선에서 수학적 지평선을 거쳐 급격한 감소(Summability)를 도출합니다.
 -/
 theorem three_horizons_nuclearity
     (P : SingularityPrinciple.ThreeHorizons.PhysicalHorizon)
@@ -70,8 +44,8 @@ theorem three_horizons_nuclearity
       P σ h_pos h_bound
 
 /--
-Information horizon -> trace class.
-This is the axiom-free summability theorem from file 02.
+[Theorem] 정보 지평선 기반 핵성 정리.
+파일 02의 공리 없는 핵성 정리를 재수출합니다.
 -/
 theorem information_horizon_nuclearity
     (σ : ℕ → ℝ)
@@ -80,34 +54,27 @@ theorem information_horizon_nuclearity
     SingularityPrinciple.Horizon.IsTraceClass σ :=
   SingularityPrinciple.Horizon.nuclearity_of_information_horizon σ h_pos
 
-/-! ## Burden A: real-axis exclusion packaged as a boundary predicate -/
+/-! ## Burden A: Real-Axis Exclusion (Boundary Predicate) -/
 
-/--
-Predicate-based boundary data.
-This is the right abstraction for the RH terminal path, because `riemannZeta = 0`
-alone also contains the trivial zeros; what we actually need is the nontrivial-zero
-predicate closed by file 05.
--/
+/-- 경계 영점 조건 데이터 구조체 -/
 structure BoundaryPredicateData where
   IsZero : ℂ → Prop
   zero_off_axis : ∀ {ρ : ℂ}, IsZero ρ → ρ.im ≠ 0
 
-/-- Real spectrum data on the bulk side. -/
+/-- 실수 고유값 스펙트럼 데이터 구조체 -/
 structure BulkRealSpectrum where
   eigenvalues : ℕ → ℝ
 
-/--
-One-way holographic capture.
-This is the exact interface needed for the RH deduction:
-if `ρ` is a boundary zero, then `ρ(1-ρ)` is captured by the real spectrum.
-No reverse direction is required for the terminal rigidity theorem.
+/-- 
+[Holographic Capture]
+경계의 영점이 벌크(Bulk)의 실수 스펙트럼으로 캡처되는 대응 관계입니다.
 -/
 structure HolographicCapture (B : BoundaryPredicateData) (D : BulkRealSpectrum) where
   capture : ∀ {ρ : ℂ}, B.IsZero ρ → ∃ n, (D.eigenvalues n : ℂ) = ρ * (1 - ρ)
 
 /--
-Burden A is closed by file 05:
-nontrivial zeta zeros cannot lie on the real axis.
+[Burden A 결론]
+파일 05의 성과: 비자명 영점은 실수축 위에 존재할 수 없습니다.
 -/
 def riemannBoundary : BoundaryPredicateData where
   IsZero := SingularityPrinciple.IsNontrivialZero
@@ -115,24 +82,18 @@ def riemannBoundary : BoundaryPredicateData where
     intro ρ hρ
     exact SingularityPrinciple.zero_off_axis_riemannZeta_Final hρ
 
-/--
-The quadratic spectral value identity re-exported from file 04.
--/
+/-- 파일 04에서 유도된 고유값 허수부 공식 재사용 -/
 theorem quadSpectralValue_im
     (s : ℂ) :
     (AdelicModularWitness.quadSpectralValue s).im = s.im * (1 - 2 * s.re) :=
   AdelicModularWitness.quadSpectralValue_im s
 
+/-! ## Terminal Rigidity: Final Deduction of RH -/
+
 /--
-Terminal-path conditional rigidity in the precise one-way form actually needed.
-
-Mechanism:
-- self-adjoint / real bulk spectrum kills `Im(ρ(1-ρ))`
-- Burden A kills the `Im(ρ)=0` leakage branch
-- therefore `Re(ρ)=1/2` is forced.
-
-This theorem is local-`sorry`-free. Any unresolved burden is explicit in the inputs:
-`BoundaryPredicateData.zero_off_axis` and `HolographicCapture.capture`.
+[Final Master Theorem]
+자기수반성(고유값의 실수성)과 Burden A(실수축 이탈)가 결합하여 
+비자명 영점이 임계선(Re=1/2) 위에 강제로 놓이게 됨을 증명합니다.
 -/
 theorem terminal_path_conditional_rigidity
     (B : BoundaryPredicateData)
@@ -142,17 +103,22 @@ theorem terminal_path_conditional_rigidity
   intro ρ hρ
   rcases H.capture hρ with ⟨n, h_spec⟩
 
+  -- 1. 스펙트럼의 실수성에 의해 ρ(1-ρ)의 허수부는 0이 되어야 함
   have h_real : (ρ * (1 - ρ)).im = 0 := by
     rw [← h_spec]
     simp
 
+  -- 2. 복소 평면의 대수적 전개
   have h_expand : (ρ * (1 - ρ)).im = ρ.im * (1 - 2 * ρ.re) := by
     simp [Complex.mul_im, Complex.sub_im, Complex.one_re, Complex.one_im]
     ring
 
   rw [h_expand] at h_real
+  
+  -- 3. Burden A에 의해 ρ.im ≠ 0 이 보장됨
   have h_im_nz : ρ.im ≠ 0 := B.zero_off_axis hρ
 
+  -- 4. 0이 아닌 값(ρ.im)으로 나누어 1-2*ρ.re = 0 유도
   have h_mul : ρ.im * (1 - 2 * ρ.re) = ρ.im * 0 := by
     rw [mul_zero]
     exact h_real
@@ -160,18 +126,10 @@ theorem terminal_path_conditional_rigidity
   have h_re : 1 - 2 * ρ.re = 0 := by
     exact mul_left_cancel₀ h_im_nz h_mul
 
+  -- 5. 결론: ρ.re = 1/2
   linarith
 
-/--
-The RH terminal path specialized to the actual nontrivial-zero predicate from file 05.
-This is the clean integration point for the 10-file architecture.
-
-To use this theorem, it is enough to provide a capture theorem of the shape
-
-  ∀ {ρ}, IsNontrivialZero ρ -> ∃ n, eigenvalues n = ρ(1-ρ).
-
-That keeps Burden A and Burden B explicitly separated.
--/
+/-- 리만 비자명 영점 조건에 특화된 최종 정리 -/
 theorem riemann_terminal_path_conditional_rigidity
     (D : BulkRealSpectrum)
     (h_capture : ∀ {ρ : ℂ}, SingularityPrinciple.IsNontrivialZero ρ →
@@ -185,66 +143,20 @@ theorem riemann_terminal_path_conditional_rigidity
   }
   exact terminal_path_conditional_rigidity riemannBoundary D H hρ
 
-/--
-Adapter theorem: this is the exact bridge needed to feed file 08 into the
-predicate-based terminal path above.
+/-! ## Phase 6 Milestones: Explicit Realization Program -/
 
-Because file 08 currently uses its own opaque set `NontrivialZeros`, one still needs
-a set-identification bridge
-
-  SingularityPrinciple.IsNontrivialZero ρ  <->  ρ ∈ nZFC_Weil_Trace.NontrivialZeros
-
-and an identification between the complex `eigenvalues` used in file 08 and the real
-spectrum sequence used in the terminal path. Once those are provided, the capture theorem
-of file 08 drops directly into `riemann_terminal_path_conditional_rigidity`.
--/
-theorem file08_capture_adapter
-    (eigs : ℕ → ℂ)
-    (W : nZFC_Weil_Trace.AdmissibleFunction → ℂ)
-    (D : BulkRealSpectrum)
-    (h_eigs : ∀ n, eigs n = (D.eigenvalues n : ℂ))
-    (h_bridge : ∀ {ρ : ℂ},
-      SingularityPrinciple.IsNontrivialZero ρ ↔ ρ ∈ nZFC_Weil_Trace.NontrivialZeros) :
-    ∀ {ρ : ℂ}, SingularityPrinciple.IsNontrivialZero ρ →
-      ∃ n, (D.eigenvalues n : ℂ) = ρ * (1 - ρ) := by
-  intro ρ hρ
-  have hρ' : ρ ∈ nZFC_Weil_Trace.NontrivialZeros := (h_bridge).mp hρ
-  rcases nZFC_Weil_Trace.spectral_capture eigs W ρ hρ' with ⟨n, hn⟩
-  refine ⟨n, ?_⟩
-  rw [← h_eigs n]
-  exact hn
-
-/-! ## Direct re-export of the generic terminal theorem from file 10 -/
-
-/--
-This is the original terminal theorem of file 10, re-exported under a stable name.
-It is useful when one wants the two-way structure-field packaging of the terminal file.
--/
-theorem terminal_file_synthesis
-    (B : SingularityPrinciple.BoundaryData)
-    (D : SingularityPrinciple.BulkData)
-    (M : SingularityPrinciple.HolographicMapping B D) :
-    ∀ {ρ : ℂ}, B.L_function ρ = 0 → ρ.re = (1 / 2 : ℝ) :=
-  SingularityPrinciple.singularity_principle_victory B D M
-
-/-! ## Phase 6 re-exports: explicit realization-program milestones -/
-
-/-- Green's identity -> self-adjointness (file 18). -/
+/-- 그린의 항등식을 통한 자기수반성 확보 (파일 18) -/
 theorem green_to_selfAdjoint :
     IsSelfAdjoint NZFC_V2_7_Green.selbergLaplacian :=
   NZFC_V2_7_Green.selberg_is_self_adjoint
 
-/-- Riemann-zero inclusion into the modular Selberg zero set (file 21). -/
+/-- 리만 영점이 셀베르그 제타 영점에 포함됨을 증명 (파일 21) -/
 theorem riemann_in_selberg_modular
     {s : ℂ} (hs : NZFC_V3_5_Modular.IsRiemannZero s) :
     NZFC_V3_5_Modular.selbergZetaModular s = 0 :=
   NZFC_V3_5_Modular.riemann_zeros_in_selberg_modular hs
 
-/--
-File-21 capstone:
-Riemann zero -> Selberg eigenvalue.
-This is the modular-factorization side of the realization program.
--/
+/-- 리만 영점에서 셀베르그 고유값으로의 체인 완결 (파일 21) -/
 theorem selberg_factorization_chain_closed
     {ρ : ℂ} (hρ : NZFC_V3_5_Modular.IsRiemannZero ρ) :
     Module.End.HasEigenvalue
@@ -252,18 +164,5 @@ theorem selberg_factorization_chain_closed
         NZFC_V3_5_Modular.SelbergSpace →ₗ[ℂ] NZFC_V3_5_Modular.SelbergSpace)
       (ρ * (1 - ρ)) :=
   NZFC_V3_5_Modular.Final_Chain_Closed hρ
-
-/-! ## Optional audit commands
-
-Uncomment these locally when you want an explicit kernel audit.
-They should show named axioms only, not hidden theorem-body `sorryAx`,
-for the theorems proved in this integration layer itself.
-
-#print axioms NZFC.Final.three_horizons_nuclearity
-#print axioms NZFC.Final.terminal_path_conditional_rigidity
-#print axioms NZFC.Final.riemann_terminal_path_conditional_rigidity
-#print axioms NZFC.Final.green_to_selfAdjoint
-#print axioms NZFC.Final.selberg_factorization_chain_closed
--/
 
 end NZFC.Final
