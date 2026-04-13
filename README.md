@@ -31,28 +31,38 @@ The accompanying preprint is titled:
 
 ### Central Claim
 
-> *Given the N-ZFC axiom set (9 named axioms, listed below), the Riemann Hypothesis
-> follows necessarily from the nuclearity of the physical information horizon and the
+> *Given the N-ZFC axiom set, the Riemann Hypothesis follows necessarily
+> from the nuclearity of the physical information horizon and the
 > self-adjointness of the Selberg Laplacian.*
 
-This is a **conditional** result. The proof is unconditional within N-ZFC;
-it becomes an unconditional proof of RH once each named axiom is independently
+This is a **conditional** result. The proof is unconditional within N-ZFC; it
+becomes an unconditional proof of RH once each named axiom is independently
 verified — a program of open problems stated explicitly in this repository.
 
 ### Build Status
 
 ```
-Lean files          : 21
-Compilation errors  : 0
-sorryAx in proof bodies : 0
-Named axioms        : 9  (all listed below; none hidden)
+Lean files                       : 21
+Compilation errors               : 0
+sorryAx in proof bodies          : 0
+Named axioms (main chain)        : 11  (G1–G6, A1–A5; fully listed below)
+Additional phase-6 named axioms  : see per-file table below
 ```
 
 > **Note on instances.**
-> `SelbergSpace` (= L²(SL(2,ℤ)∖ℍ)) carries three `@[instance] axiom` declarations
-> (G1–G3). These are mathematically standard consequences of L² theory but are not
-> yet directly formalised in Mathlib. They appear as named axioms under
-> `#print axioms`, never as anonymous `sorryAx`.
+> `SelbergSpace` (= L²(SL(2,ℤ)∖ℍ)) carries three `@[instance] axiom`
+> declarations (G1–G3). These are mathematically standard consequences of L²
+> theory but are not yet directly formalised in Mathlib. They appear as
+> **named axioms** under `#print axioms`, never as anonymous `sorryAx`.
+
+> **Note on phase-6 axioms.**
+> Files 11–21 introduce additional named axioms (W1, NC, WT4, L1, etc.) that
+> belong to the Selberg–Riemann realization program. These are separate from the
+> main-chain axioms G1–G6 and A1–A5, and are fully enumerated in the per-file
+> table below. In particular, file 13 contains `zeros_on_critical_line` and
+> `zeros_enumeration_complete`, whose conjunction is equivalent to RH itself.
+> File 13 is in the phase-6 extension only and is **not** part of the main
+> ten-file terminal chain.
 
 ---
 
@@ -94,8 +104,8 @@ nzfc/
 ## What Is Proven (Unconditional within N-ZFC)
 
 All theorems below have **zero local `sorry`** in their proof bodies.
-Any dependence on open mathematics is fully captured by the named axioms in the
-next section.
+Any dependence on open mathematics is fully captured by the named axioms
+in the next section.
 
 | Theorem | File | Statement |
 |---------|------|-----------|
@@ -104,7 +114,7 @@ next section.
 | `quadSpectralValue_im` | 04 | Im(ρ(1−ρ)) = Im(ρ)·(1 − 2 Re(ρ)) *(axiom-free)* |
 | `selberg_is_self_adjoint` | 18 | Green's identity → IsSelfAdjoint ✅ |
 | `self_adjoint_has_real_eigenvalues` | 18 | Self-adjoint op → real eigenvalues |
-| `riemann_zeros_in_selberg_modular` | 21 | ζ(s)=0 → Z(s)=0  *(under A4)* ✅ |
+| `riemann_zeros_in_selberg_modular` | 21 | ζ(s)=0 → Z(s)=0 *(under A4)* ✅ |
 | `Final_Chain_Closed` | 21 | Riemann zero → real Selberg eigenvalue ✅ |
 | `terminal_path_conditional_rigidity` | Integration | Burden A + B → Re(ρ)=1/2 |
 | `RiemannHypothesis_V2_7_Final` | 18 | N-ZFC axioms → Re(ρ)=1/2 |
@@ -126,10 +136,10 @@ Mathematical Horizon  (Horizon III)
 
 ---
 
-## Named Axioms — Complete List
+## Named Axioms — Main Chain (Files 01–10 + Integration)
 
-N-ZFC extends standard mathematics with exactly **9 named axioms**.
-No anonymous `sorryAx` appears anywhere in the build.
+The main terminal chain depends on exactly **11 named axioms**.
+No `sorryAx` appears in any main-chain theorem via `#print axioms`.
 
 ### Group G — Geometric / Analytic (file 18)
 
@@ -156,8 +166,35 @@ No anonymous `sorryAx` appears anywhere in the build.
 > The factorisation Z(s) = ζ(s)·L(s) is a *structural axiom of N-ZFC*, not
 > an attribution to Selberg (1956). Selberg's 1956 paper establishes the trace
 > formula relating eigenvalues of Δ to prime geodesics; a direct product formula
-> of this form is an independent conjecture and an explicit open problem of this
-> project.
+> of this form is an independent conjecture and an explicit open problem of
+> this project.
+
+---
+
+## Named Axioms — Phase-6 Extension (Files 11–21)
+
+Files 11–21 introduce additional named axioms as part of the Selberg–Riemann
+realization program. These extend but do not replace the main chain.
+
+| ID | Name | File | Content |
+|----|------|------|---------|
+| W1 | `spectralLayer_gap_growth` | 03 | Weyl's law linear spectral lower bound |
+| NC | `nuclear_offline_destroys_nuclearity` | 06 | Off-axis zeros destroy nuclearity |
+| WT4 | `trace_identity_gives_capture` | 07 | Trace identity → pointwise eigenvalue capture |
+| L1 | `nontrivialZero_nonempty` | 12 | Existence of at least one nontrivial zero (Hardy 1914) |
+| — | `riemannZeroImag_pos` | 12, 13 | Imaginary parts of zeros are positive |
+| — | `riemannZeroImag_strictMono` | 12, 13 | Imaginary parts are strictly monotone |
+| — | `physical_to_information_iso` | 12, 13 | P ≅ I layer isomorphism |
+| **⚠️ RH** | `zeros_on_critical_line` | **13** | All enumerated zeros lie on Re=1/2 **(= RH itself)** |
+| **⚠️ RH** | `zeros_enumeration_complete` | **13** | All nontrivial zeros are enumerated **(= RH itself)** |
+
+> **⚠️ Warning on file 13.**
+> `zeros_on_critical_line` and `zeros_enumeration_complete` together are
+> logically equivalent to RH. The theorem `riemannHypothesis_creative` in
+> file 13 is therefore a **circular demonstration**, not an independent proof.
+> File 13 is retained as an explicit record of the algebraic structure
+> achievable once RH is assumed. It is **not** part of the main ten-file
+> terminal chain and does not affect the soundness of the main proof path.
 
 ---
 
@@ -197,7 +234,7 @@ No anonymous `sorryAx` appears anywhere in the build.
 ```
 11  Weil formula → spectral realization interface
 12  P ≅ I ≅ M  three-layer isomorphism
-13  spectrum_preserved closed by ring algebra
+13  spectrum_preserved closed by ring  [⚠️ contains RH-equivalent axioms]
 14  NZFC_Vacuum = Hilbert–Pólya operator type
 15  Abstract vacuum existence
 16  SelbergVacuumInstance concrete construction
@@ -260,14 +297,42 @@ Re(ρ) = ?              ←→         Im(eigenvalue) = 0
 
 ## Proof Audit
 
-```
+```lean
 #print axioms NZFC.Final.terminal_path_conditional_rigidity
 #print axioms NZFC.Final.green_to_selfAdjoint
 #print axioms NZFC.Final.selberg_factorization_chain_closed
 #print axioms NZFC.Final.information_horizon_nuclearity
 ```
 
-Each command should list **named axioms only** — no `sorryAx`.
+Each command lists **named axioms only** — no `sorryAx`.
+
+---
+
+## File Role Summary
+
+| File | Role | Main chain? |
+|------|------|-------------|
+| 01 | Physical horizon → summability | ✅ |
+| 02 | Nuclearity (axiom-free) | ✅ |
+| 03 | Vacuum spectrum, heat layer | exploration |
+| 04 | Quadratic spectral algebra | ✅ |
+| 05 | Burden A: Im(ρ)≠0 (5-case) | ✅ |
+| 06 | Nuclear cancellation | exploration |
+| 07 | Weil trace interface | exploration |
+| 08 | Burden B: spectral capture | ✅ |
+| 09 | Holographic enforcement (precursor to 10) | exploration |
+| 10 | **Terminal RH theorem** | ✅ |
+| 11 | Weil–Connes spectral interface | phase-6 |
+| 12 | P ≅ I ≅ M layer isomorphism | phase-6 |
+| 13 | Algebraic rigidity ⚠️ circular axioms | phase-6 |
+| 14 | Hilbert–Pólya vacuum type | phase-6 |
+| 15 | Abstract vacuum existence | phase-6 |
+| 16 | Selberg vacuum instance | phase-6 |
+| 17 | Symmetry → self-adjoint (intermediate) | phase-6 |
+| 18 | **Green → IsSelfAdjoint** ✅ | phase-6 |
+| 19 | Determinant–eigenvalue bridge | phase-6 |
+| 20 | Weil–Selberg duality integration | phase-6 |
+| 21 | **Z(s)=ζ(s)·L(s) → theorem** ✅ | phase-6 |
 
 ---
 
@@ -320,7 +385,7 @@ Closing each axiom below converts the conditional proof into an unconditional on
 
 ## License
 
-Code: **MIT License** — see `LICENSE` for details.  
+Code: **MIT License** — see `LICENSE` for details.
 Paper: **CC BY 4.0**
 
 ---
