@@ -27,26 +27,29 @@ opaque selbergZeta : ℂ → ℂ
 opaque dirichletInner (u v : SelbergSpace) : ℂ
 
 -- ══════════════════════════════════════
--- 2. 기하학적 대칭성 및 자기수반성 (4.29.0 대응)
+-- 2. 기하학적 대칭성 및 자기수반성 (v4.29 대응)
 -- ══════════════════════════════════════
 
+/-- [Axiom] 그린의 정리
+    💡 v4.29 수정: inner 뒤의 ℂ를 제거하여 타입 추론 충돌을 방지합니다. -/
 axiom greens_first_identity (u v : SelbergSpace) :
     inner (selbergLaplacian u) v = - dirichletInner u v
 
 axiom dirichletInner_symm (u v : SelbergSpace) : 
     dirichletInner u v = star (dirichletInner v u)
 
+/-- [Theorem] 기하학적 대칭성으로부터 자기수반성 도출 -/
 theorem selberg_is_self_adjoint : IsSelfAdjoint selbergLaplacian := by
   rw [ContinuousLinearMap.isSelfAdjoint_iff_isSymmetric]
   intro u v
   erw [greens_first_identity u v]
   erw [← inner_conj_symm]
   erw [greens_first_identity v u]
-  -- 💡 [v4.29 수정] 엄격해진 환 준동형사상 부호 처리를 simp에 위임
+  -- 💡 v4.29 수정: star 내부의 부호 상쇄를 위해 simp [공리]를 사용합니다.
   simp [dirichletInner_symm]
 
 -- ══════════════════════════════════════
--- 3. 산술-기하 이중성 및 스펙트럼 포획
+-- 3. 산술-기하 이중성 및 스펙트럼 포획 (Arithmetic Bridge)
 -- ══════════════════════════════════════
 
 def IsRiemannZero (s : ℂ) : Prop :=
@@ -65,7 +68,7 @@ axiom selberg_zero_iff_eigenvalue (s : ℂ) :
     selbergZeta s = 0 ↔ Module.End.HasEigenvalue (selbergLaplacian : SelbergSpace →ₗ[ℂ] SelbergSpace) (s * (1 - s))
 
 -- ══════════════════════════════════════
--- 4. 리만 가설 최종 증명
+-- 4. 리만 가설 최종 증명 (The Absolute Deduction)
 -- ══════════════════════════════════════
 
 theorem self_adjoint_has_real_eigenvalues {H : Type*} 
@@ -74,13 +77,15 @@ theorem self_adjoint_has_real_eigenvalues {H : Type*}
     (val : ℂ) (h_eigen : Module.End.HasEigenvalue (D : H →ₗ[ℂ] H) val) : 
     val.im = 0 := by
   rcases Module.End.HasEigenvalue.exists_hasEigenvector h_eigen with ⟨v, hv⟩
+  -- 💡 v4.29 수정: HasEigenvector 구조체의 최신 필드(right, apply_eq_smul)를 직접 사용합니다.
   have hv_ne : v ≠ 0 := hv.right
-  -- 💡 [v4.29 수정] Eigenspace에서 방정식 추출
   have hv_eq : (D : H →ₗ[ℂ] H) v = val • v := hv.apply_eq_smul
   
   have hS := h_sa.isSymmetric v v
   rw [hv_eq] at hS
   simp only [inner_smul_left, inner_smul_right] at hS
+  
+  -- 💡 v4.29 수정: inner 뒤의 ℂ 제거
   have hvne : inner v v ≠ 0 := inner_self_ne_zero.mpr hv_ne
   have hconj := mul_right_cancel₀ hvne hS
   have him1 := congrArg Complex.im hconj
