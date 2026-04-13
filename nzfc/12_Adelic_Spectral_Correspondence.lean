@@ -12,7 +12,7 @@ noncomputable section
 open Complex Real Topology
 
 /-!
-  NZFC_LayerUnification.lean
+NZFC_LayerUnification.lean
 
   세 지평선의 범주론적 동형:
     P (물리계: 아델릭 연산자)
@@ -111,7 +111,8 @@ def LayerIso.comp
   spectrum_preserved := fun a => by
     simp [g.spectrum_preserved, f.spectrum_preserved]
 
-theorem three_layer_unification
+-- 💡 [수정됨] theorem 대신 def를 사용하여 Type 오류를 해결했습니다.
+def three_layer_unification
     (eigenvalues : ℕ → ℝ)
     (h_match : ∀ n, eigenvalues n = riemannSpectralValue n) :
     LayerIso ℕ {ρ : ℂ // IsNontrivialZero ρ}
