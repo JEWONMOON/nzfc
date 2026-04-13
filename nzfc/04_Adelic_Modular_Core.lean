@@ -4,30 +4,31 @@ import Mathlib.Analysis.InnerProductSpace.Spectrum
 import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Tactic
+-- 💡 [중복 정의 해결] 03번 파일에서 IsNontrivialZero 정의를 가져옵니다.
+import nzfc.«03_Vacuum_Spectrum»
 
 noncomputable section
 open Complex Real
-open scoped InnerProductSpace -- 내적 공간 매크로 안전 확보
+open scoped InnerProductSpace
 
 namespace AdelicModularWitness
 
-/-- Nontrivial zeros of the Riemann zeta function. -/
-def IsNontrivialZero (s : ℂ) : Prop :=
-  riemannZeta s = 0 ∧
-  (¬ ∃ n : ℕ, s = -2 * ((n : ℂ) + 1)) ∧
-  s ≠ 1
+/-!
+## 1. Modular Energy & Spectral Mapping
+리만 제타의 영점을 아델릭 모듈러 에너지 평면으로 사상하는 핵심 변환층입니다.
+-/
 
 /-- Modular-energy encoding. -/
 def Emod (s : ℂ) : ℂ :=
   Complex.mk s.im ((1 / 2 : ℝ) - s.re)
 
-@[simp] theorem Emod_re (s : ℂ) : (Emod s).re = s.im := by
+@[simp] theorem Emod_re (s : 0 : ℂ) : (Emod s).re = s.im := by
   simp [Emod]
 
 @[simp] theorem Emod_im (s : ℂ) : (Emod s).im = (1 / 2 : ℝ) - s.re := by
   simp [Emod]
 
-/-- The critical line is exactly the locus where the modular energy is real. -/
+/-- 임계선(Critical Line)은 모듈러 에너지가 실수가 되는 궤적과 일치합니다. -/
 theorem criticalLine_iff_Emod_real (s : ℂ) :
     (Emod s).im = 0 ↔ s.re = (1 / 2 : ℝ) := by
   constructor
@@ -37,84 +38,42 @@ theorem criticalLine_iff_Emod_real (s : ℂ) :
   · intro h
     simp [Emod_im, h]
 
-/-- Quadratic spectral value attached to a zero candidate. -/
+/-- Quadratic spectral value: ρ(1-ρ)에 대응하는 모듈러 에너지 제곱 사상 -/
 def quadSpectralValue (s : ℂ) : ℂ :=
   ((1 / 4 : ℂ) + (Emod s) ^ 2)
 
-/-- Real shadow-side spectral value used by trace-class heat shadows. -/
-def zeroSpectralValue (s : ℂ) : ℝ :=
-  (1 / 4 : ℝ) + ((Emod s).re) ^ 2
-
-/-- `quadSpectralValue` is exactly the Connes/Berry–Keating parameter `ρ(1-ρ)`. -/
+/-- `quadSpectralValue`는 정확히 Connes/Berry–Keating 파라미터인 `s(1-s)`와 일치합니다. -/
 theorem quadSpectralValue_eq_rho_one_sub_rho (s : ℂ) :
     quadSpectralValue s = s * (1 - s) := by
   apply Complex.ext <;>
     simp [quadSpectralValue, Emod, pow_two, Complex.mul_re, Complex.mul_im] <;>
     ring
 
-/-- Real part of the quadratic spectral value. -/
-theorem quadSpectralValue_re (s : ℂ) :
-    (quadSpectralValue s).re = s.re * (1 - s.re) + s.im ^ 2 := by
-  rw [quadSpectralValue_eq_rho_one_sub_rho]
-  simp [Complex.mul_re]
-  ring
-
-/-- Imaginary part of the quadratic spectral value. -/
+/-- quadSpectralValue의 허수부 추출 -/
 theorem quadSpectralValue_im (s : ℂ) :
     (quadSpectralValue s).im = s.im * (1 - 2 * s.re) := by
   rw [quadSpectralValue_eq_rho_one_sub_rho]
   simp [Complex.mul_im, Complex.sub_im, Complex.one_im]
   ring
 
-/-- `quadSpectralValue` is real iff either the zero lies on the real axis or on the critical line. -/
-theorem quadSpectralValue_real_iff (s : ℂ) :
-    (quadSpectralValue s).im = 0 ↔ s.im = 0 ∨ s.re = (1 / 2 : ℝ) := by
-  rw [quadSpectralValue_im, mul_eq_zero]
-  constructor
-  · rintro (h | h)
-    · exact Or.inl h
-    · exact Or.inr (by linarith)
-  · rintro (h | h)
-    · exact Or.inl h
-    · exact Or.inr (by linarith)
-
-/-- Relation between the full quadratic spectral parameter and the real shadow-side value. -/
-theorem quad_real_part_as_zeroSpectral_minus_square (s : ℂ) :
-    (quadSpectralValue s).re = zeroSpectralValue s - (s.re - (1 / 2 : ℝ)) ^ 2 := by
-  rw [quadSpectralValue_re]
-  simp [zeroSpectralValue, Emod_re]
-  ring
-
-/-- On the critical line, the full quadratic value collapses to the real shadow value. -/
-theorem quad_eq_zeroSpectral_cast_of_criticalLine {s : ℂ}
-    (h : s.re = (1 / 2 : ℝ)) :
-    quadSpectralValue s = ((zeroSpectralValue s : ℝ) : ℂ) := by
-  apply Complex.ext
-  · rw [quad_real_part_as_zeroSpectral_minus_square]
-    simp [h]
-  · rw [quadSpectralValue_im]
-    simp [h]
-
-/-- If the quadratic spectral value is real and the zero ordinate is nonzero,
-then the modular energy itself is real. -/
+/-- 고유값이 실수이고 세로축 성분이 0이 아니면, 모듈러 에너지는 반드시 실수입니다. -/
 theorem quad_eigenvalue_real_to_emod
     {ρ : ℂ} (hρ_im : ρ.im ≠ 0)
     (h : (quadSpectralValue ρ).im = 0) :
     (Emod ρ).im = 0 := by
   rw [quadSpectralValue_im] at h
-  have htwice : (2 : ℝ) * (ρ.im * ((1 / 2 : ℝ) - ρ.re)) = 0 := by
-    calc
-      (2 : ℝ) * (ρ.im * ((1 / 2 : ℝ) - ρ.re)) = ρ.im * (1 - 2 * ρ.re) := by ring
-      _ = 0 := h
-  have hprod : ρ.im * ((1 / 2 : ℝ) - ρ.re) = 0 := by
-    apply mul_left_cancel₀ two_ne_zero
-    show (2 : ℝ) * (ρ.im * ((1 / 2 : ℝ) - ρ.re)) = (2 : ℝ) * 0
-    simpa using htwice
-  rcases mul_eq_zero.mp hprod with him | hre
+  have h_prod : ρ.im * (1 - 2 * ρ.re) = 0 := h
+  rcases mul_eq_zero.mp h_prod with him | hre
   · exact absurd him hρ_im
-  · simpa [Emod_im] using hre
+  · -- 1 - 2*ρ.re = 0  =>  ρ.re = 1/2  =>  Emod.im = 0
+    simp [Emod_im]
+    linarith
 
-/-- Self-adjoint Laplace/modular core. -/
+/-!
+## 2. Self-Adjoint Laplace Core
+NZFC의 물리적 하부 구조를 담당하는 자기수반 연산자 층입니다.
+-/
+
 structure LaplaceCore (H : Type) [NormedAddCommGroup H]
     [InnerProductSpace ℂ H] [CompleteSpace H] where
   Δ : H →L[ℂ] H
@@ -123,10 +82,9 @@ structure LaplaceCore (H : Type) [NormedAddCommGroup H]
 
 namespace LaplaceCore
 
-variable {H : Type}
-variable [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-/-- Eigenvalues of the self-adjoint/symmetric core are real. -/
+/-- 자기수반 연산자의 고유값은 반드시 실수입니다. -/
 theorem eigenvalue_real
     (L : LaplaceCore H) {val : ℂ}
     (hlam : Module.End.HasEigenvalue (L.Δ : H →ₗ[ℂ] H) val) :
@@ -136,70 +94,51 @@ theorem eigenvalue_real
   have hv_eq : (L.Δ : H →ₗ[ℂ] H) v = val • v :=
     Module.End.HasEigenvector.apply_eq_smul hv
   
-  -- hS는 자동으로 ⟪Δ v, v⟫ = ⟪v, Δ v⟫ 명제를 가집니다.
   have hS := L.hsymm v v
   rw [hv_eq] at hS
   simp only [inner_smul_left, inner_smul_right] at hS
   
-  -- inner v v 를 직접 타이핑하는 대신 Lean의 타입 추론에 완전히 위임합니다.
   have hconj : star val = val := mul_right_cancel₀ (inner_self_ne_zero.mpr hv_ne) hS
-  
   have him1 : (star val).im = val.im := congrArg Complex.im hconj
   have him2 : (star val).im = -val.im := by simp
   linarith
 
 end LaplaceCore
 
-/-- Trace-class heat shadow: the NZFC finite-capacity law. -/
+/-!
+## 3. Global NZFC Package
+Finite-capacity 가설과 리만 가설 도출 로직을 통합합니다.
+-/
+
 structure NuclearHeatShadow (H : Type) [NormedAddCommGroup H]
     [InnerProductSpace ℂ H] [CompleteSpace H] where
-  β : ℝ
-  hβ : 0 < β
-  K : H →L[ℂ] H
   weights : ℕ → ℝ
-  weights_nonneg : ∀ n : ℕ, 0 ≤ weights n
   summable_weights : Summable weights
 
-namespace NuclearHeatShadow
-
-variable {H : Type}
-variable [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-
-/-- The heat shadow carries a finite trace-budget sequence. -/
-theorem finite_budget (S : NuclearHeatShadow H) : Summable S.weights :=
-  S.summable_weights
-
-/-- Formal shadow trace as the sum of admissible weights. -/
-noncomputable def actualShadowTrace (S : NuclearHeatShadow H) : ℝ :=
-  tsum S.weights
-
-end NuclearHeatShadow
-
-/-- Global NZFC package: admissible vacuum = unitary core + trace-class heat shadow. -/
 structure NZFCVacuumData (H : Type) [NormedAddCommGroup H]
     [InnerProductSpace ℂ H] [CompleteSpace H] where
   core : LaplaceCore H
   shadow : NuclearHeatShadow H
 
-/-- Single global NZFC law. -/
+/-- [Axiom] NZFC 글로벌 법측: 모든 비자명 영점은 자기수반 코어의 스펙트럼에 포획됩니다. -/
 axiom ax_nzfc_global_law :
   ∃ (H : Type)
     (_ : NormedAddCommGroup H)
     (_ : InnerProductSpace ℂ H)
     (_ : CompleteSpace H)
     (V : NZFCVacuumData H),
-      ∀ (ρ : ℂ), IsNontrivialZero ρ →
+      ∀ (ρ : ℂ), SingularityPrinciple.IsNontrivialZero ρ →
         ρ.im ≠ 0 ∧
         Module.End.HasEigenvalue (V.core.Δ : H →ₗ[ℂ] H) (quadSpectralValue ρ)
 
-/-- Single-zero NZFC theorem. -/
+/-- [Main Result] 아델릭 모듈러 코어 하에서 비자명 영점은 임계선 위에 존재합니다. -/
 theorem criticalLine_of_nontrivialZero_of_NZFC
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
     (V : NZFCVacuumData H)
-    (hglobal : ∀ (ρ : ℂ), IsNontrivialZero ρ →
+    (hglobal : ∀ (ρ : ℂ), SingularityPrinciple.IsNontrivialZero ρ →
       ρ.im ≠ 0 ∧
       Module.End.HasEigenvalue (V.core.Δ : H →ₗ[ℂ] H) (quadSpectralValue ρ))
-    {ρ : ℂ} (hρ : IsNontrivialZero ρ) :
+    {ρ : ℂ} (hρ : SingularityPrinciple.IsNontrivialZero ρ) :
     ρ.re = (1 / 2 : ℝ) := by
   have hImNe : ρ.im ≠ 0 := (hglobal ρ hρ).1
   have hSpec : Module.End.HasEigenvalue (V.core.Δ : H →ₗ[ℂ] H) (quadSpectralValue ρ) :=
@@ -210,27 +149,13 @@ theorem criticalLine_of_nontrivialZero_of_NZFC
     quad_eigenvalue_real_to_emod hImNe hQuadReal
   exact (criticalLine_iff_Emod_real ρ).mp hEmodReal
 
-/-- Fundamental NZFC theorem: admissible finite-capacity vacua force RH. -/
+/-- 🏆 최종 리만 가설 도출 정리 -/
 theorem riemannHypothesis_of_NZFC :
     _root_.RiemannHypothesis := by
   obtain ⟨H, _, _, _, V, hglobal⟩ := ax_nzfc_global_law
   intro ρ hz htriv h1
-  have hNT : IsNontrivialZero ρ := ⟨hz, htriv, h1⟩
+  -- 03번 파일에서 가져온 구조를 사용하여 NT 영점 생성
+  let hNT : SingularityPrinciple.IsNontrivialZero ρ := ⟨hz, htriv, h1⟩
   exact criticalLine_of_nontrivialZero_of_NZFC V hglobal hNT
-
-/-- NZFC exposes the finite trace budget carried by the admissible shadow. -/
-theorem shadow_budget_of_NZFC :
-    ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-      (_ : CompleteSpace H) (V : NZFCVacuumData H),
-        Summable V.shadow.weights := by
-  obtain ⟨H, h1, h2, h3, V, _⟩ := ax_nzfc_global_law
-  exact ⟨H, h1, h2, h3, V, V.shadow.summable_weights⟩
-
-/-- Package theorem: NZFC gives both finite trace budget and the RH consequence. -/
-theorem nzfc_master_package :
-    (∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H)
-       (_ : CompleteSpace H) (V : NZFCVacuumData H), Summable V.shadow.weights)
-    ∧ _root_.RiemannHypothesis := by
-  exact ⟨shadow_budget_of_NZFC, riemannHypothesis_of_NZFC⟩
 
 end AdelicModularWitness
