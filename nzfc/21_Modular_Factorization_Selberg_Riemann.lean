@@ -28,8 +28,13 @@ opaque selbergZetaModular : ℂ → ℂ
 -- ══════════════════════════════════════
 
 /-- 
-[Axiom A4] Selberg-Riemann Factorization.
+[N-ZFC Axiom A4] Selberg-Riemann Spectral Factorization.
 Z(s) = ζ(s) * L_factor(s)
+
+This is a structural axiom of N-ZFC, not an attribution to Selberg (1956).
+Selberg's trace formula relates eigenvalues of Δ to prime geodesics;
+a direct product factorization of this form is an independent conjecture
+and an explicit open problem of this project.
 -/
 axiom selberg_zeta_factorization (s : ℂ) :
   ∃ (L_factor : ℂ), selbergZetaModular s = riemannZeta s * L_factor
