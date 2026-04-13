@@ -17,8 +17,7 @@ namespace NZFC_V3_5_Modular
 -- 1. 모듈러 서피스(Modular Surface) 및 기초 정의
 -- ══════════════════════════════════════
 
--- 18번 파일에서 정의된 SelbergSpace와 Laplacian 설정을 공유하거나 재선언합니다.
--- (통합 빌드 시 충돌 방지를 위해 NZFC_V2_7_Green의 정의를 참조하는 것이 좋습니다.)
+-- 18번 파일에서 정의된 SelbergSpace와 Laplacian 설정을 공유하여 사용합니다.
 export NZFC_V2_7_Green (SelbergSpace selbergLaplacian)
 
 /-- 모듈러 군 SL(2, ℤ) 기반의 셀베르그 제타 함수 -/
@@ -87,12 +86,13 @@ theorem Final_Chain_Closed {ρ : ℂ} (hρ : IsRiemannZero ρ) :
     · exact NZFC_V2_7_Green.selberg_is_self_adjoint
     · exact h_eigen_complex
 
-  -- 4. 복소수 ρ(1-ρ)를 실수 λ로 추출하여 타입 정합성 완성
-  let λ_val : ℝ := (ρ * (1 - ρ)).re
-  use λ_val
+  -- 4. 복소수 ρ(1-ρ)를 실수 값으로 추출하여 타입 정합성 완성
+  -- 💡 에러 해결: λ 대신 real_val 변수명을 사용합니다.
+  let real_val : ℝ := (ρ * (1 - ρ)).re
+  use real_val
   constructor
-  · -- λ_val을 복소수로 캐스팅한 것이 원본 고유값과 같음을 보임
-    have h_eq : (λ_val : ℂ) = ρ * (1 - ρ) := by
+  · -- real_val을 복소수로 캐스팅한 것이 원본 고유값과 같음을 보임
+    have h_eq : (real_val : ℂ) = ρ * (1 - ρ) := by
       apply Complex.ext
       · rfl
       · simp [h_im_zero]
