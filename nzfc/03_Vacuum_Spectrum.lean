@@ -136,9 +136,11 @@ theorem riemann_hypothesis_realization (V : TwoLayerVacuum H) {ρ : ℂ} (hρ : 
   linarith
 end TwoLayerVacuum
 
+-- 💡 [수정됨] Mathlib 업데이트로 인한 RiemannHypothesis 정의 충돌을 막기 위해 명시적 조건식으로 변경
 theorem Singularity_Principle_TwoLayer
     {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
-    (V : TwoLayerVacuum H) : _root_.RiemannHypothesis := by
+    (V : TwoLayerVacuum H) :
+    ∀ {s : ℂ}, riemannZeta s = 0 → (¬ ∃ n : ℕ, s = -2 * ((n : ℂ) + 1)) → s ≠ 1 → s.re = 1 / 2 := by
   intro s hs htriv h1
   exact V.riemann_hypothesis_realization ⟨hs, htriv, h1⟩
 
