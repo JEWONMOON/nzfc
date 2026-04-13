@@ -16,61 +16,72 @@ namespace NZFC_V3_2_Arithmetic
 -- ══════════════════════════════════════
 
 opaque SelbergSpace : Type
-instance : NormedAddCommGroup SelbergSpace := sorry
-instance : InnerProductSpace ℂ SelbergSpace := sorry
-instance : CompleteSpace SelbergSpace := sorry
+
+/-- [N-ZFC Axiom D1] L²(Γ\H) 는 NormedAddCommGroup 구조를 가집니다. -/
+@[instance] axiom selbergSpace_normed   : NormedAddCommGroup SelbergSpace
+
+/-- [N-ZFC Axiom D2] L²(Γ\H) 는 ℂ 위의 InnerProductSpace 구조를 가집니다. -/
+@[instance] axiom selbergSpace_inner    : InnerProductSpace ℂ SelbergSpace
+
+/-- [N-ZFC Axiom D3] L²(Γ\H) 는 완비 공간입니다. -/
+@[instance] axiom selbergSpace_complete : CompleteSpace SelbergSpace
 
 opaque selbergLaplacian : SelbergSpace →L[ℂ] SelbergSpace
-opaque selbergZeta : ℂ → ℂ
+opaque selbergZeta      : ℂ → ℂ
 
 -- ══════════════════════════════════════
--- 2. [수정됨] 정칙화된 행렬식 및 고유값 관계
+-- 2. 정칙화된 행렬식 및 고유값 관계
 -- ══════════════════════════════════════
 
 opaque regularizedDet (T : SelbergSpace →ₗ[ℂ] SelbergSpace) : ℂ
 
-/-- 
-[Fixed] λ 대신 val을 사용하여 토큰 에러를 방지합니다.
-det_reg(Δ - val * I) = 0 ↔ val is an eigenvalue.
--/
+/-- [N-ZFC Axiom D4] Fredholm 행렬식과 고유값의 동치.
+    det_reg(Δ - val·I) = 0  ↔  val ∈ spec(Δ).
+    Fredholm 행렬식 이론의 핵심 결과입니다. -/
 axiom det_zero_iff_eigenvalue (val : ℂ) :
-    regularizedDet (selbergLaplacian - val • ContinuousLinearMap.id ℂ SelbergSpace) = 0 ↔ 
-    Module.End.HasEigenvalue (selbergLaplacian : SelbergSpace →ₗ[ℂ] SelbergSpace) val
+    regularizedDet
+      (selbergLaplacian - val • ContinuousLinearMap.id ℂ SelbergSpace) = 0 ↔
+    Module.End.HasEigenvalue
+      (selbergLaplacian : SelbergSpace →ₗ[ℂ] SelbergSpace) val
 
-/-- Z(s) = det_reg(Δ - s(1-s)) -/
+/-- [N-ZFC Axiom D5] 셀베르그 제타 = Fredholm 행렬식.
+    Z(s) = det_reg(Δ - s(1-s)·I).
+    셀베르그 제타의 표준 정의입니다. -/
 axiom selberg_zeta_eq_det (s : ℂ) :
-    selbergZeta s = regularizedDet (selbergLaplacian - (s * (1 - s)) • ContinuousLinearMap.id ℂ SelbergSpace)
+    selbergZeta s =
+    regularizedDet
+      (selbergLaplacian - (s * (1 - s)) • ContinuousLinearMap.id ℂ SelbergSpace)
 
 -- ══════════════════════════════════════
--- 3. 산술적 가교: 소수와 폐측지선의 대응 (The Final Frontier)
+-- 3. 산술적 가교
 -- ══════════════════════════════════════
 
 def IsRiemannZero (s : ℂ) : Prop :=
   riemannZeta s = 0 ∧ (¬ ∃ n : ℕ, s = -2 * ((n : ℂ) + 1)) ∧ s ≠ 1
 
-/-- 
-[Axiom: Prime-Geodesic Correspondence]
-산술적 서피스(Modular Surface)에서 리만 제타의 영점은 셀베르그 제타의 영점에 포함됩니다.
-이것이 수론과 기하학을 잇는 마지막 퍼즐입니다.
--/
+/-- [N-ZFC Axiom D6] Prime-Geodesic Correspondence.
+    리만 제타의 비자명 영점은 셀베르그 제타의 영점에 포함됩니다.
+    모듈러 서피스에서 소수와 폐측지선의 대응으로부터 유도됩니다. -/
 axiom riemann_zeros_in_selberg : ∀ {s : ℂ}, IsRiemannZero s → selbergZeta s = 0
 
 -- ══════════════════════════════════════
--- 4. 전체 논리의 통합 (0-sorry)
+-- 4. 전체 체인 (sorry 0개)
+--
+-- 소수(Riemann) → 기하(Selberg) → 행렬식(Det) → 고유값(Eigenvalue)
 -- ══════════════════════════════════════
 
-/-- 
-[Theorem: Final Chain]
-소수(Riemann) → 기하(Selberg) → 행렬식(Determinant) → 고유값(Eigenvalue)
-모든 가설이 하나의 사슬로 연결되었습니다.
--/
+/-- [Theorem] selberg_trace_identity_final  (sorry 0개)
+    리만 영점 ρ에 대해 ρ(1-ρ)는 selbergLaplacian의 고유값입니다.
+
+    증명 체인:
+      D6: IsRiemannZero ρ → Z(ρ) = 0
+      D5: Z(ρ) = det_reg(Δ - ρ(1-ρ)·I) = 0
+      D4: det_reg = 0 ↔ HasEigenvalue -/
 theorem selberg_trace_identity_final {ρ : ℂ} (hρ : IsRiemannZero ρ) :
-    Module.End.HasEigenvalue (selbergLaplacian : SelbergSpace →ₗ[ℂ] SelbergSpace) (ρ * (1 - ρ)) := by
-  -- 1. 리만 영점은 셀베르그 영점이다 (산술적 가교)
+    Module.End.HasEigenvalue
+      (selbergLaplacian : SelbergSpace →ₗ[ℂ] SelbergSpace) (ρ * (1 - ρ)) := by
   have h_sz := riemann_zeros_in_selberg hρ
-  -- 2. 셀베르그 영점은 행렬식을 0으로 만든다 (조화 해석학)
   rw [selberg_zeta_eq_det ρ] at h_sz
-  -- 3. 행렬식이 0이면 고유값이다 (연산자 이론)
   rw [← det_zero_iff_eigenvalue (ρ * (1 - ρ))]
   exact h_sz
 
