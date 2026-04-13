@@ -46,8 +46,9 @@ theorem three_horizons_nuclearity
     (h_bound : ∀ n, σ n ≤
         SingularityPrinciple.ThreeHorizons.PhysicalHorizon.suppressedEnergy P n) :
     Summable σ := by
-  exact SingularityPrinciple.ThreeHorizons.mathematicalHorizon_of_physicalHorizon
-          P σ h_pos h_bound |>.summable
+  obtain ⟨a, ha⟩ := SingularityPrinciple.ThreeHorizons.mathematicalHorizon_of_physicalHorizon
+          P σ h_pos h_bound
+  exact ha.summable
 
 /--
 Information horizon → trace class.
