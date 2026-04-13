@@ -1,3 +1,4 @@
+/- nzfc.lean (마스터 루트 파일) -/
 import nzfc.«01_Cosmic_Horizon»
 import nzfc.«02_Nuclear_Budget»
 import nzfc.«03_Vacuum_Spectrum»
@@ -19,3 +20,4 @@ import nzfc.«18_Green_Identity_Self_Adjoint»
 import nzfc.«19_Determinant_Eigenvalue_Bridge»
 import nzfc.«20_Weil_Selberg_Duality_Integration»
 import nzfc.«21_Modular_Factorization_Selberg_Riemann»
+import nzfc.NZFC_Final_Integrated
